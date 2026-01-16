@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * US Cities Data Collection Script
  * 
@@ -11,6 +12,7 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
+// @ts-ignore
 import Papa from 'papaparse';
 
 const DATA_DIR = path.join(process.cwd(), 'scripts', 'data');
@@ -82,13 +84,13 @@ async function parseCitiesCSV(csvPath: string): Promise<ProcessedCity[]> {
         Papa.parse<RawCityData>(csvContent, {
             header: true,
             skipEmptyLines: true,
-            complete: (results) => {
+            complete: (results: Papa.ParseResult<RawCityData>) => {
                 const cities: ProcessedCity[] = results.data
-                    .filter((row) => {
+                    .filter((row: RawCityData) => {
                         const pop = parseInt(row.population || '0');
                         return pop >= 5000; // Only cities with 5k+ population
                     })
-                    .map((row) => {
+                    .map((row: RawCityData) => {
                         const slug = `${row.city_ascii.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${row.state_id.toLowerCase()}`;
 
                         return {
@@ -107,7 +109,7 @@ async function parseCitiesCSV(csvPath: string): Promise<ProcessedCity[]> {
                 console.log(`✅ Parsed ${cities.length} cities with 5k+ population`);
                 resolve(cities);
             },
-            error: (error) => {
+            error: (error: Error) => {
                 reject(error);
             },
         });
