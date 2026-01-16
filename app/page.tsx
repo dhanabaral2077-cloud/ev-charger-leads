@@ -1,9 +1,9 @@
-import { getAllCities, type City } from '@/lib/mock-data';
+import { getAllRealCities, type RealCityData } from '@/lib/real-data';
 import Link from 'next/link';
 
 export default function HomePage() {
-  // Get all mock cities
-  const topCities = getAllCities();
+  // Get all real cities
+  const topCities = getAllRealCities();
 
   // Group cities by state
   type CityData = typeof topCities[number];
@@ -28,22 +28,22 @@ export default function HomePage() {
           </p>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Why Install a Home Charger?</h2>
+            <h2 className="text-2xl font-bold mb-4">Real Data, Real Savings</h2>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
                 <div className="text-4xl mb-2">⚡</div>
-                <div className="font-semibold">Faster Charging</div>
-                <div className="text-sm text-emerald-100">Full charge overnight</div>
+                <div className="font-semibold">Actual Utility Rates</div>
+                <div className="text-sm text-emerald-100">From your local provider</div>
               </div>
               <div>
                 <div className="text-4xl mb-2">💰</div>
-                <div className="font-semibold">Save Money</div>
-                <div className="text-sm text-emerald-100">50-70% cheaper than public</div>
+                <div className="font-semibold">Specific Rebates</div>
+                <div className="text-sm text-emerald-100">Up to $3,500 available</div>
               </div>
               <div>
-                <div className="text-4xl mb-2">🏠</div>
-                <div className="font-semibold">Convenience</div>
-                <div className="text-sm text-emerald-100">Charge while you sleep</div>
+                <div className="text-4xl mb-2">📊</div>
+                <div className="font-semibold">ROI Calculations</div>
+                <div className="text-sm text-emerald-100">See exact monthly savings</div>
               </div>
             </div>
           </div>
@@ -52,30 +52,47 @@ export default function HomePage() {
 
       {/* Search by City */}
       <section className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Find Installers in Your City
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+          Top 10 Cities with Real Data
         </h2>
+        <p className="text-center text-gray-600 mb-8">
+          Actual utility providers, specific rebate amounts, and ROI calculations
+        </p>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {(Object.entries(citiesByState) as [string, CityData[]][])
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([state, cities]) => (
-              <div key={state} className="bg-white rounded-xl shadow-sm p-6">
+              <div key={state} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <span className="text-2xl">📍</span>
                   {cities[0].state}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {cities.map((city) => (
                     <li key={city.slug}>
                       <Link
                         href={`/${city.slug}`}
-                        className="text-emerald-600 hover:text-emerald-700 hover:underline flex justify-between items-center"
+                        className="block hover:bg-emerald-50 -mx-2 px-2 py-2 rounded transition-colors"
                       >
-                        <span>{city.name}</span>
-                        <span className="text-sm text-gray-500">
-                          ${city.avgInstallCost.toLocaleString()}
-                        </span>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="text-emerald-600 hover:text-emerald-700 font-medium">
+                              {city.name}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {city.utilityProvider}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-gray-900">
+                              ${city.avgInstallCost.toLocaleString()}
+                            </div>
+                            <div className="text-xs text-emerald-600">
+                              ${city.totalRebates.toLocaleString()} rebates
+                            </div>
+                          </div>
+                        </div>
                       </Link>
                     </li>
                   ))}
@@ -139,7 +156,7 @@ export default function HomePage() {
             © 2026 EV Charger Leads. Connecting homeowners with licensed electricians nationwide.
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Demo version with sample data
+            Real data from official sources: EIA, DSIRE, Census Bureau, BLS
           </p>
         </div>
       </footer>
