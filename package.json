@@ -3,24 +3,43 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "collect:cities": "tsx scripts/collect-cities.ts",
+    "collect:rates": "tsx scripts/collect-electricity-rates.ts",
+    "collect:incentives": "tsx scripts/collect-incentives.ts",
+    "collect:all": "npm run collect:cities && npm run collect:rates && npm run collect:incentives",
+    "seed": "tsx scripts/seed-database.ts",
+    "generate:content": "tsx scripts/generate-content.ts",
+    "setup": "npm run collect:all && npm run seed && npm run generate:content"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
+    "csv-parser": "^3.2.0",
     "next": "16.1.2",
+    "papaparse": "^5.5.3",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@prisma/client": "^5.22.0",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.30",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.2",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

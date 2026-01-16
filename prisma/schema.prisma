@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model City {
+  id                String   @id @default(cuid())
+  name              String
+  state             String
+  stateAbbr         String
+  county            String?
+  zipCodes          String[] // Array of zip codes
+  population        Int
+  latitude          Float
+  longitude         Float
+  slug              String   @unique // URL-friendly: "austin-tx"
+  
+  // Local data
+  electricityRate   Float?   // $/kWh
+  utilityCompany    String?
+  avgInstallCost    Int?     // Average installation cost in dollars
+  
+  // SEO & Content
+  metaTitle         String?
+  metaDescription   String?
+  aiGeneratedIntro  String?  @db.Text
+  aiGeneratedFaq    Json?    // Store FAQ Q&A pairs
+  
+  // Status
+  contentGenerated  Boolean  @default(false)
+  published         Boolean  @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  incentives        Incentive[]
+  leads             Lead[]
+  
+  @@index([state])
+  @@index([population])
+  @@index([slug])
+  @@index([published])
+}
+
+model Incentive {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @db.Text
+  amount          Int?     // Dollar amount
+  percentage      Int?     // Percentage discount
+  type            String   // "federal", "state", "utility", "local"
+  provider        String   // Who offers it
+  eligibility     String?  @db.Text
+  applicationUrl  String?
+  
+  // Geographic scope
+  isNational      Boolean  @default(false)
+  state           String?
+  
+  // Relations
+  cities          City[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([state])
+  @@index([type])
+}
+
+model Lead {
+  id              String   @id @default(cuid())
+  
+  // Contact info
+  name            String
+  email           String
+  phone           String
+  
+  // Project details
+  propertyType    String   // "single-family", "multi-family", "condo"
+  evModel         String?  // Tesla Model 3, etc.
+  timeline        String   // "immediate", "1-3 months", "3-6 months"
+  hasGarage       Boolean?
+  
+  // Location
+  cityId          String
+  city            City     @relation(fields: [cityId], references: [id])
+  zipCode         String
+  
+  // Lead quality
+  qualified       Boolean  @default(false)
+  callDuration    Int?     // seconds
+  status          String   @default("new") // "new", "contacted", "qualified", "sold", "rejected"
+  
+  // Monetization
+  soldTo          String?  // Lead buyer name
+  soldPrice       Float?   // How much we sold it for
+  soldAt          DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([cityId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ContentTemplate {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  type            String   // "intro", "faq", "cost-breakdown"
+  template        String   @db.Text
+  variables       Json     // List of variables like {city}, {state}, etc.
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model SiteSettings {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  value           Json
+  
+  updatedAt       DateTime @updatedAt
+}
